@@ -94,9 +94,9 @@ Create the root `package.json`:
   "private": true,
   "version": "0.1.0",
   "scripts": {
-    "dev:api": "pnpm --filter @gaming/api start:dev",
-    "build:api": "pnpm --filter @gaming/api build",
-    "test:api": "pnpm --filter @gaming/api test"
+    "dev:api": "pnpm --filter @guildcore/api start:dev",
+    "build:api": "pnpm --filter @guildcore/api build",
+    "test:api": "pnpm --filter @guildcore/api test"
   }
 }
 ```
@@ -119,11 +119,11 @@ pnpm dlx @nestjs/cli new api \
   --no-interactive
 ```
 
-Then edit `apps/api/package.json` and change only its `name` to `@gaming/api` (keep the generated dependencies and scripts):
+Then edit `apps/api/package.json` and change only its `name` to `@guildcore/api` (keep the generated dependencies and scripts):
 
 ```json
 {
-  "name": "@gaming/api"
+  "name": "@guildcore/api"
 }
 ```
 
@@ -140,7 +140,7 @@ If you would rather use modern ESM, that is also valid; in that case follow the 
 ### 3.3 Install backend dependencies
 
 ```bash
-pnpm --filter @gaming/api add \
+pnpm --filter @guildcore/api add \
   @nestjs/config \
   @nestjs/typeorm typeorm pg \
   @nestjs/swagger \
@@ -148,7 +148,7 @@ pnpm --filter @gaming/api add \
   class-validator class-transformer \
   argon2 cookie-parser
 
-pnpm --filter @gaming/api add -D \
+pnpm --filter @guildcore/api add -D \
   @types/cookie-parser \
   dotenv
 ```
@@ -159,13 +159,13 @@ Later, install features at the milestone that requires them:
 
 ```bash
 # When implementing voice:
-pnpm --filter @gaming/api add livekit-server-sdk
+pnpm --filter @guildcore/api add livekit-server-sdk
 
 # When implementing jobs and Redis-backed state:
-pnpm --filter @gaming/api add @nestjs/bullmq bullmq ioredis
+pnpm --filter @guildcore/api add @nestjs/bullmq bullmq ioredis
 
 # When enabling a multi-instance Socket.IO deployment:
-pnpm --filter @gaming/api add @socket.io/redis-adapter
+pnpm --filter @guildcore/api add @socket.io/redis-adapter
 ```
 
 The `@socket.io/redis-adapter` has its own Redis client setup and is unnecessary with one API instance. Use a Redis client library compatible with the chosen adapter; do not assume a BullMQ connection is automatically suitable for Socket.IO.
@@ -201,15 +201,15 @@ services:
     image: postgres:17
     restart: unless-stopped
     environment:
-      POSTGRES_USER: gaming
-      POSTGRES_PASSWORD: gaming_dev
-      POSTGRES_DB: gaming_platform
+      POSTGRES_USER: guildcore
+      POSTGRES_PASSWORD: guildcore_dev
+      POSTGRES_DB: guildcore
     ports:
-      - '127.0.0.1:5432:5432'
+      - '127.0.0.1:${POSTGRES_PORT:-5432}:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U gaming -d gaming_platform']
+      test: ['CMD-SHELL', 'pg_isready -U guildcore -d guildcore']
       interval: 5s
       timeout: 5s
       retries: 5
@@ -236,7 +236,7 @@ docker compose -f infra/compose.yaml up -d
 docker compose -f infra/compose.yaml ps
 
 docker compose -f infra/compose.yaml exec postgres \
-  psql -U gaming -d gaming_platform -c 'SELECT 1;'
+  psql -U guildcore -d guildcore -c 'SELECT 1;'
 
 docker compose -f infra/compose.yaml exec redis \
   redis-cli ping
@@ -258,6 +258,8 @@ docker compose -f infra/compose.yaml down -v
 
 The usernames and passwords above are **development-only** examples, not production secrets. In production do not publish PostgreSQL or Redis ports broadly and require appropriate network isolation/authentication.
 
+`POSTGRES_PORT` changes only the host port (default `5432`). If that port is already taken on your machine, start Compose with another host port and point `DATABASE_URL` at it, for example `POSTGRES_PORT=5434 docker compose -f infra/compose.yaml up -d`.
+
 ---
 
 ## 5. Configure the NestJS application
@@ -269,7 +271,7 @@ Create `apps/api/.env.example`:
 ```dotenv
 NODE_ENV=development
 PORT=3000
-DATABASE_URL=postgresql://gaming:gaming_dev@localhost:5432/gaming_platform
+DATABASE_URL=postgresql://guildcore:guildcore_dev@localhost:5432/guildcore
 REDIS_URL=redis://localhost:6379
 WEB_URL=http://localhost:5173
 API_URL=http://localhost:3000
@@ -339,8 +341,8 @@ app.useGlobalPipes(
 );
 
 const swaggerConfig = new DocumentBuilder()
-  .setTitle('Gaming Platform API')
-  .setDescription('Gaming community platform backend')
+  .setTitle('Guildcore API')
+  .setDescription('Guildcore community platform backend')
   .setVersion('1.0')
   .build();
 
@@ -437,7 +439,7 @@ For this **CommonJS development setup**, the paths are relative to `apps/api` an
 Install TypeORM TypeScript CLI support:
 
 ```bash
-pnpm --filter @gaming/api add -D ts-node
+pnpm --filter @guildcore/api add -D ts-node
 ```
 
 From `apps/api` (not repository root):
@@ -743,7 +745,7 @@ These are **only** safe for local development. Running a public service with dev
 Install the server SDK if not already installed:
 
 ```bash
-pnpm --filter @gaming/api add livekit-server-sdk
+pnpm --filter @guildcore/api add livekit-server-sdk
 ```
 
 Illustrative NestJS service method:
@@ -944,7 +946,7 @@ Recommended data split:
 | New messages and status updates | Socket.IO subscriptions |
 | Voice audio and room participants | LiveKit client SDK |
 | UI-only state | React state or a small store |
-| Shared payload types | `@gaming/contracts` |
+| Shared payload types | `@guildcore/contracts` |
 
 Keep a clear strategy for cache invalidation and reconnect catch-up; avoid one massive global Redux-like store for every server message if a query cache plus normalized message reconciliation is sufficient.
 
@@ -956,13 +958,13 @@ Example package metadata:
 
 ```json
 {
-  "name": "@gaming/contracts",
+  "name": "@guildcore/contracts",
   "private": true,
   "version": "0.1.0"
 }
 ```
 
-Configure `exports` and build output when the package starts shipping consumable TypeScript/JavaScript to multiple workspaces. Add it as a workspace dependency (e.g. `"@gaming/contracts": "workspace:*"`) in consumers. Public API contracts should be versioned intentionally as the clients may not all update together.
+Configure `exports` and build output when the package starts shipping consumable TypeScript/JavaScript to multiple workspaces. Add it as a workspace dependency (e.g. `"@guildcore/contracts": "workspace:*"`) in consumers. Public API contracts should be versioned intentionally as the clients may not all update together.
 
 ### 13.3 Electron later
 

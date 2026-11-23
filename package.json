@@ -1,0 +1,15 @@
+{
+  "name": "guildcore",
+  "private": true,
+  "version": "0.1.0",
+  "packageManager": "pnpm@10.20.0",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "dev:api": "pnpm --filter @guildcore/api start:dev",
+    "build:api": "pnpm --filter @guildcore/api build",
+    "test:api": "pnpm --filter @guildcore/api test",
+    "test:api:e2e": "pnpm --filter @guildcore/api test:e2e"
+  }
+}
