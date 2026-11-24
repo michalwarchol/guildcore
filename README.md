@@ -54,6 +54,17 @@ pnpm start:dev
 
 `pnpm seed` upserts development users and refuses to run when `NODE_ENV=production`. Every seed password is `password123` and exists only for local testing. One account is `john.doe@michalwarchol.com` (`john_doe`). The others are `jane.doe@michalwarchol.com` and `alex.smith@michalwarchol.com`.
 
+### Working within database
+
+```bash
+docker compose -f infra/compose.yaml exec postgres bash # enter docker container
+psql -U guildcore -d guildcore # enter PostgreSQL database
+\dt # view tables
+SELECT id FROM users; # do your operations
+\q # exit database
+exit # exit docker container
+```
+
 ## Docs
 
 - [ARCHITECTURE.md](./ARCHITECTURE.md) — system design
