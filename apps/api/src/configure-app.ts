@@ -25,6 +25,7 @@ export function configureApp(app: INestApplication): void {
       .setTitle('Guildcore API')
       .setDescription('Guildcore community platform backend')
       .setVersion('1.0')
+      .addCookieAuth('guildcore.session')
       .build();
     const document = SwaggerModule.createDocument(app, swaggerConfig);
     SwaggerModule.setup('api/docs', app, document);
