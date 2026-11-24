@@ -3,6 +3,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { validateEnv } from './config/validate-env';
 import { HealthController } from './health/health.controller';
+import { AuthModule } from './modules/auth/auth.module';
+import { UsersModule } from './modules/users/users.module';
 
 @Module({
   imports: [
@@ -22,6 +24,8 @@ import { HealthController } from './health/health.controller';
         migrationsRun: false,
       }),
     }),
+    AuthModule,
+    UsersModule,
   ],
   controllers: [HealthController],
 })

@@ -42,6 +42,18 @@ Installed versions from the lockfile (the range in `package.json` may be wider).
 | oxlint | 1.94.0 | Linting |
 | Prettier | 3.10.1 | Formatting |
 
+## Local API
+
+From `apps/api`, with PostgreSQL running:
+
+```bash
+pnpm migration:run
+pnpm seed
+pnpm start:dev
+```
+
+`pnpm seed` upserts development users and refuses to run when `NODE_ENV=production`. Every seed password is `password123` and exists only for local testing. One account is `john.doe@michalwarchol.com` (`john_doe`). The others are `jane.doe@michalwarchol.com` and `alex.smith@michalwarchol.com`.
+
 ## Docs
 
 - [ARCHITECTURE.md](./ARCHITECTURE.md) — system design

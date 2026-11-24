@@ -25,7 +25,7 @@ describe('validateEnv', () => {
   });
 
   it('allows the foundation to boot without Steam or LiveKit', () => {
-    const env = { ...developmentEnv };
+    const env: Record<string, string> = { ...developmentEnv };
     delete env.LIVEKIT_URL;
     delete env.LIVEKIT_API_KEY;
     delete env.LIVEKIT_API_SECRET;
@@ -37,7 +37,7 @@ describe('validateEnv', () => {
   });
 
   it('rejects a missing database URL', () => {
-    const env = { ...developmentEnv };
+    const env: Record<string, string> = { ...developmentEnv };
     delete env.DATABASE_URL;
 
     expect(() => validateEnv(env)).toThrow('DATABASE_URL is required');
