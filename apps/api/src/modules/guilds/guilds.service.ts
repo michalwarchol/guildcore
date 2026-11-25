@@ -1,10 +1,11 @@
 import {
   ForbiddenException,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
-import { DataSource, Repository } from 'typeorm';
+import { DataSource, QueryFailedError, Repository } from 'typeorm';
 import { GuildMember } from './guild-member.entity';
 import { Guild } from './guild.entity';
 import { MemberRole } from './member-role.entity';
@@ -177,4 +178,53 @@ export class GuildsService {
       throw new ForbiddenException('Missing permission');
     }
   }
+
+  async addMember(guildId: string, userId: string): Promise<GuildMember> {
+    try {
+      return await this.dataSource.transaction(async (manager) => {
+        const members = manager.getRepository(GuildMember);
+        const existing = await members.findOne({ where: { guildId, userId } });
+        if (existing) {
+          return existing;
+        }
+        const everyone = await manager.getRepository(Role).findOne({
+          where: { guildId, isDefault: true },
+        });
+        if (!everyone) {
+          throw new InternalServerErrorException('Guild has no default role');
+        }
+        const member = await members.save(
+          members.create({
+            guildId,
+            userId,
+            nickname: null,
+          }),
+        );
+        await manager.getRepository(MemberRole).save(
+          manager.getRepository(MemberRole).create({
+            guildId,
+            userId,
+            roleId: everyone.id,
+          }),
+        );
+        return member;
+      });
+    } catch (error) {
+      if (!isUniqueViolation(error)) {
+        throw error;
+      }
+      const existing = await this.members.findOne({ where: { guildId, userId } });
+      if (!existing) {
+        throw error;
+      }
+      return existing;
+    }
+  }
+}
+
+function isUniqueViolation(error: unknown): boolean {
+  return (
+    error instanceof QueryFailedError &&
+    (error.driverError as { code?: string } | undefined)?.code === '23505'
+  );
 }
