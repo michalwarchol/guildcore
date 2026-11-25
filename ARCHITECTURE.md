@@ -237,19 +237,22 @@ All primary keys are UUIDs unless explicitly stated. Use `timestamptz` for times
 | --- | --- | --- |
 | `guilds` | `id`, `name`, `description`, `icon_url`, `owner_id`, timestamps | Community server |
 | `guild_members` | `guild_id`, `user_id`, `joined_at`, `nickname` | Composite key `(guild_id, user_id)` |
-| `roles` | `id`, `guild_id`, `name`, `permissions`, `position` | Permissions can be a bitset or normalized set |
-| `member_roles` | `guild_id`, `user_id`, `role_id` | Enforce guild consistency; avoid cross-guild role assignment |
-| `channels` | `id`, `guild_id NULL`, `name`, `type`, `position`, `parent_id NULL`, timestamps | Guild text/voice or DM/group DM |
-| `channel_members` | `channel_id`, `user_id`, `joined_at` | DM/group DM access; not required for ordinary guild channels |
-| `channel_permission_overrides` | `channel_id`, `subject_type`, `subject_id`, `allow`, `deny` | Later if fine-grained overrides are needed |
+| `roles` | `id`, `guild_id`, `name`, `permissions`, `position`, `is_default` | Permissions are a bitset. `UNIQUE (id, guild_id)` supports cross-guild assignment checks |
+| `member_roles` | `guild_id`, `user_id`, `role_id` | Composite foreign keys to `guild_members` and `roles` so a role cannot cross guilds |
+| `channel_sections` | `id`, `guild_id`, `name`, `position` | Organizes channels. A section is not a channel and has no other fields |
+| `channels` | `id`, `guild_id`, `section_id NULL`, `name`, `type`, `emoji`, `game_tag NULL`, `position`, timestamps | Guild text/voice. `section_id` is null when the channel sits at the guild root |
+| `channel_members` | `channel_id`, `user_id`, `joined_at` | Later, for DM/group DM. Not created for guild channels |
+| `channel_permission_overrides` | `channel_id`, `subject_type`, `subject_id`, `allow`, `deny` | Later. Guild roles are enough for the current slice |
 
 Suggested channel types:
 
 ```ts
-type ChannelType = 'GUILD_TEXT' | 'GUILD_VOICE' | 'DM' | 'GROUP_DM';
+type ChannelType = 'text' | 'voice';
 ```
 
-A guild channel has a `guild_id`; DM/group DM channels have `guild_id = NULL` and use explicit `channel_members`. Define separate validation rules for allowed channel type and guild membership combinations. Guild authorization derives from membership, effective role permissions, and channel overrides. DM authorization derives from `channel_members`. An owner/administrator bypass, if introduced, must be explicitly documented and consistently enforced.
+DM and group DM types are deferred. Until then every channel has a `guild_id`. A channel may belong to one section in the same guild, or to none. Deleting a section leaves its channels at the guild root.
+
+Guild authorization uses membership and the OR of role bitsets. `ADMINISTRATOR` allows every check, including removing a member once membership management exists. The guild owner cannot be removed. Inviting requires membership only, so every member can invite; there is no invite permission bit. Channel overrides are not evaluated yet. The role bitset can gain an allow/deny layer later. DM authorization will use `channel_members` when those channels exist.
 
 ### 5.3 Messages and attachments
 
@@ -302,10 +305,11 @@ VIEW_CHANNEL
 SEND_MESSAGES
 CONNECT_VOICE
 SPEAK_VOICE
-MODERATE_MEMBERS
 ```
 
-Every message write/read, attachment operation, guild membership change, socket subscription, and LiveKit join token request must check the **current** permissions. Check again when access is revoked: remove unauthorized sockets from rooms and remove/disconnect LiveKit participants as applicable. A minted LiveKit token should be short-lived, room-scoped, tied to the authenticated user, and **not** used as the platform's primary session credential.
+Creating a guild inserts the owner as a member, an Everyone role (`VIEW_CHANNEL`, `SEND_MESSAGES`, `CONNECT_VOICE`, `SPEAK_VOICE`), and an Administrator role (`ADMINISTRATOR`) assigned to the owner.
+
+Every message write/read, attachment operation, guild membership change, socket subscription, and LiveKit join token request must check the **current** permissions. A missing guild or channel, and a caller who is not a member, returns `404`. A member who lacks the required permission returns `403`. Check again when access is revoked: remove unauthorized sockets from rooms and remove/disconnect LiveKit participants as applicable. A minted LiveKit token should be short-lived, room-scoped, tied to the authenticated user, and **not** used as the platform's primary session credential.
 
 ---
 
@@ -598,8 +602,8 @@ A product decision may move Steam immediately after M2, since it is a differenti
 
 - Whether the application should support **anonymous/guest accounts**, or only registered users.
 - Exact session storage, expiry and device-management policy.
-- Whether guild channel permissions require overrides for MVP or only guild roles.
-- Whether the first release includes 1:1 and group DMs, or only guild channels.
+- Guild channel permission overrides are deferred. The current slice uses guild roles only.
+- Direct and group messages are deferred. The current slice has guild text and voice channels only.
 - Message deletion/retention policy and reporting/moderation requirements.
 - Hosting region and LiveKit Cloud vs self-hosting.
 - Public data disclosure and Steam privacy UX.
