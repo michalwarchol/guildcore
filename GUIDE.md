@@ -613,10 +613,13 @@ VIEW_CHANNEL
 SEND_MESSAGES
 CONNECT_VOICE
 SPEAK_VOICE
-MODERATE_MEMBERS
 ```
 
-Decide whether channel-level overrides are included in MVP; if not, guild roles should still be designed so overrides can be layered on later. Handle DM/group DM separately via channel membership. Distinguish absent resource (`404`) from forbidden access (`403`) consistently, avoiding private resource enumeration.
+The current slice uses guild roles only. Channel permission overrides and DM `channel_members` are deferred; role bitsets stay compatible with a later allow/deny layer. Removing a member requires `ADMINISTRATOR`, and the owner cannot be removed. Every guild member can invite; inviting is membership, not a permission bit. Invite and member-removal endpoints are not in this slice.
+
+Channels may sit in a `channel_sections` row or directly under the guild. A section has a name and a position. Creating a section can move existing channels into it. Deleting a section leaves those channels unsectioned.
+
+Distinguish absent resource (`404`) from forbidden access (`403`). A non-member receives `404` for that guild so private guilds are not enumerated.
 
 ### 8.3 Tests
 
