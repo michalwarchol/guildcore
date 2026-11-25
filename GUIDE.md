@@ -615,7 +615,17 @@ CONNECT_VOICE
 SPEAK_VOICE
 ```
 
-The current slice uses guild roles only. Channel permission overrides and DM `channel_members` are deferred; role bitsets stay compatible with a later allow/deny layer. Removing a member requires `ADMINISTRATOR`, and the owner cannot be removed. Every guild member can invite; inviting is membership, not a permission bit. Invite and member-removal endpoints are not in this slice.
+The current slice uses guild roles only. Channel permission overrides and DM `channel_members` are deferred; role bitsets stay compatible with a later allow/deny layer. Removing a member requires `ADMINISTRATOR`, and the owner cannot be removed. Member-removal endpoints are not in this slice. Every guild member can invite; inviting is membership, not a permission bit. Invitation links last 24 hours, are multi-use until revoked or expired, and are addressed by these routes:
+
+```http
+POST   /api/v1/guilds/:guildId/invitations
+GET    /api/v1/guilds/:guildId/invitations
+DELETE /api/v1/guilds/:guildId/invitations/:invitationId
+GET    /api/v1/invitations/:token
+POST   /api/v1/invitations/:token/accept
+```
+
+`GET /guilds/:guildId/invitations` returns active invites the caller can revoke (their own, or every invite when they have `ADMINISTRATOR`) and never includes the token. Accept assigns the default Everyone role. Declining an invite is not stored.
 
 Channels may sit in a `channel_sections` row or directly under the guild. A section has a name and a position. Creating a section can move existing channels into it. Deleting a section leaves those channels unsectioned.
 
