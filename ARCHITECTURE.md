@@ -243,6 +243,7 @@ All primary keys are UUIDs unless explicitly stated. Use `timestamptz` for times
 | `channels` | `id`, `guild_id`, `section_id NULL`, `name`, `type`, `emoji`, `game_tag NULL`, `position`, timestamps | Guild text/voice. `section_id` is null when the channel sits at the guild root |
 | `channel_members` | `channel_id`, `user_id`, `joined_at` | Later, for DM/group DM. Not created for guild channels |
 | `channel_permission_overrides` | `channel_id`, `subject_type`, `subject_id`, `allow`, `deny` | Later. Guild roles are enough for the current slice |
+| `guild_invitations` | `id`, `guild_id`, `created_by`, `token_hash`, `created_at`, `expires_at`, `revoked_at` | Multi-use for 24 hours. Store only the SHA-256 of the token. Any member can create one. The creator or an `ADMINISTRATOR` can revoke it |
 
 Suggested channel types:
 
@@ -252,7 +253,7 @@ type ChannelType = 'text' | 'voice';
 
 DM and group DM types are deferred. Until then every channel has a `guild_id`. A channel may belong to one section in the same guild, or to none. Deleting a section leaves its channels at the guild root.
 
-Guild authorization uses membership and the OR of role bitsets. `ADMINISTRATOR` allows every check, including removing a member once membership management exists. The guild owner cannot be removed. Inviting requires membership only, so every member can invite; there is no invite permission bit. Channel overrides are not evaluated yet. The role bitset can gain an allow/deny layer later. DM authorization will use `channel_members` when those channels exist.
+Guild authorization uses membership and the OR of role bitsets. `ADMINISTRATOR` allows every check, including removing a member once membership management exists. The guild owner cannot be removed. Inviting requires membership only, so every member can invite; there is no invite permission bit. A link is valid for 24 hours, can be accepted by any number of authenticated non-members until it expires or is revoked, and joins them with the default Everyone role. Preview and accept of an unknown, expired, or revoked token return `404` and do not reveal the guild. Channel overrides are not evaluated yet. The role bitset can gain an allow/deny layer later. DM authorization will use `channel_members` when those channels exist.
 
 ### 5.3 Messages and attachments
 
