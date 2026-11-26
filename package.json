@@ -10,6 +10,9 @@
     "dev:api": "pnpm --filter @guildcore/api start:dev",
     "build:api": "pnpm --filter @guildcore/api build",
     "test:api": "pnpm --filter @guildcore/api test",
-    "test:api:e2e": "pnpm --filter @guildcore/api test:e2e"
+    "test:api:e2e": "pnpm --filter @guildcore/api test:e2e",
+    "dev:web": "pnpm --filter @guildcore/web dev",
+    "build:web": "pnpm --filter @guildcore/web build",
+    "test:web": "pnpm --filter @guildcore/web test"
   }
 }

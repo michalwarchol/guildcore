@@ -1,0 +1,16 @@
+.header {
+  display: flex;
+  align-items: center;
+  height: var(--header-height);
+  padding: 0 var(--space-24);
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.brand {
+  margin: 0;
+  color: var(--color-primary);
+  font-size: var(--font-size-20);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}

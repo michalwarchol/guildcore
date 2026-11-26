@@ -1,0 +1,33 @@
+// Values are derived from primary #35FF23 (hue ~116).
+// Custom properties stay available at runtime for the browser and a later Electron renderer.
+:root {
+  --color-primary: #35ff23;
+  --color-primary-hover: #59ff4b;
+  --color-primary-muted: rgb(53 255 35 / 16%);
+  --color-bg: #0a110a;
+  --color-surface: #141c14;
+  --color-border: #2a3a28;
+  --color-text: #e8f6e6;
+  --color-text-muted: #8eaa8a;
+  --color-danger: #d44838;
+
+  --space-4: 4px;
+  --space-8: 8px;
+  --space-12: 12px;
+  --space-16: 16px;
+  --space-24: 24px;
+  --space-32: 32px;
+  --space-48: 48px;
+
+  --font-size-12: 12px;
+  --font-size-14: 14px;
+  --font-size-16: 16px;
+  --font-size-20: 20px;
+  --font-size-24: 24px;
+  --font-size-32: 32px;
+
+  --radius-4: 4px;
+  --radius-8: 8px;
+
+  --header-height: 56px;
+}

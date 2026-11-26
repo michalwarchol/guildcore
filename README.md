@@ -6,7 +6,7 @@ Guildcore (`guildcore.gg`) is a gaming community platform with text chat, voice 
 
 ```text
 guildcore/
-├── apps/          # NestJS API (@guildcore/api)
+├── apps/          # NestJS API (@guildcore/api) and React web app (@guildcore/web)
 ├── packages/      # shared workspace packages
 ├── infra/         # local Docker Compose
 ├── ARCHITECTURE.md
@@ -41,6 +41,14 @@ Installed versions from the lockfile (the range in `package.json` may be wider).
 | Jest | 30.5.2 | Tests |
 | oxlint | 1.94.0 | Linting |
 | Prettier | 3.10.1 | Formatting |
+
+## Local web
+
+```bash
+pnpm dev:web
+```
+
+Open `http://localhost:5173`. The dev server is a Vite SPA, so client routes such as `/invite/:code` resolve to the same `index.html`.
 
 ## Local API
 
