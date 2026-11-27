@@ -1,0 +1,77 @@
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+.label {
+  color: var(--color-text);
+  font-size: var(--font-size-14);
+}
+
+.input {
+  padding: var(--space-12) var(--space-16);
+  border-style: solid;
+  border-color: var(--color-border);
+  border-radius: var(--radius-8);
+  background: var(--color-bg);
+  color: var(--color-text);
+  font: inherit;
+  font-size: var(--font-size-16);
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+.input:disabled {
+  cursor: not-allowed;
+  border-color: var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+}
+
+.input:disabled:focus {
+  border-color: var(--color-border);
+}
+
+.field:has(.input:disabled) .label {
+  color: var(--color-text-muted);
+}
+
+.invalid:focus {
+  border-color: var(--color-danger);
+}
+
+:global(html[data-modality='keyboard']) .input:focus {
+  outline: var(--space-4) solid var(--color-primary);
+  outline-offset: var(--space-4);
+}
+
+.invalid {
+  border-color: var(--color-danger);
+}
+
+.hint {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-14);
+}
+
+.error {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-8);
+  margin: 0;
+  color: var(--color-text);
+  font-size: var(--font-size-14);
+}
+
+.marker {
+  width: var(--space-8);
+  height: var(--space-8);
+  flex: none;
+  border-radius: var(--radius-4);
+  background: var(--color-danger);
+}
