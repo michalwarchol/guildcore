@@ -1,0 +1,82 @@
+.root {
+  position: relative;
+  min-width: 12rem;
+}
+
+.trigger {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  width: 100%;
+  min-height: 36px;
+  padding: var(--space-4) var(--space-12);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-8);
+  background: var(--color-bg);
+  color: var(--color-text);
+  font: inherit;
+  font-size: var(--font-size-14);
+  cursor: pointer;
+
+  &:focus-visible {
+    outline: var(--space-4) solid var(--color-primary-hover);
+    outline-offset: var(--space-4);
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    color: var(--color-text-muted);
+  }
+}
+
+.value {
+  flex: 1;
+  overflow: hidden;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.list {
+  position: absolute;
+  z-index: 2;
+  top: calc(100% + var(--space-4));
+  left: 0;
+  min-width: 100%;
+  margin: 0;
+  padding: var(--space-4);
+  list-style: none;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-8);
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  padding: var(--space-8);
+  border-radius: var(--radius-4);
+  cursor: pointer;
+
+  &:hover,
+  &:focus {
+    background: var(--color-primary-muted);
+    outline: none;
+  }
+
+  &[aria-selected='true'] {
+    color: var(--color-primary);
+  }
+}
+
+.icon {
+  display: inline-flex;
+  flex: none;
+}
+
+.chevron {
+  width: 16px;
+  height: 16px;
+  flex: none;
+}
