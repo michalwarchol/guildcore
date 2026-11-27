@@ -1,0 +1,56 @@
+.page {
+  position: relative;
+  min-height: 100vh;
+  background: var(--color-bg);
+}
+
+.shell {
+  position: relative;
+  display: flex;
+  min-height: 100vh;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-24);
+}
+
+.card {
+  width: 100%;
+  max-width: calc(var(--space-48) * 10);
+  padding: var(--space-32);
+  border: solid var(--color-border);
+  border-radius: var(--radius-8);
+  background: var(--color-surface);
+}
+
+.brand {
+  margin: 0 0 var(--space-16);
+  font-size: var(--font-size-14);
+}
+
+.brand a {
+  color: var(--color-primary);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.brand a:focus-visible,
+.switch a:focus-visible {
+  outline: var(--space-4) solid var(--color-primary);
+  outline-offset: var(--space-4);
+}
+
+.title {
+  margin: 0 0 var(--space-24);
+  color: var(--color-text);
+  font-size: var(--font-size-32);
+}
+
+.switch {
+  margin: var(--space-24) 0 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-14);
+}
+
+.switch a {
+  color: var(--color-primary);
+}

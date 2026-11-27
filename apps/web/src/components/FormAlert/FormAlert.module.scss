@@ -1,0 +1,13 @@
+.alert {
+  margin: 0;
+  padding: var(--space-12);
+  border: solid var(--color-danger);
+  border-radius: var(--radius-8);
+  color: var(--color-text);
+  font-size: var(--font-size-14);
+}
+
+.alert:focus {
+  outline: var(--space-4) solid var(--color-primary);
+  outline-offset: var(--space-4);
+}
